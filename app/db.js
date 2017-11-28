@@ -1,4 +1,4 @@
 // db.js
 var mongoose = require('mongoose');
 var config = require('../config');
-mongoose.connect(config.database);
+module.exports = mongoose.connect(config.database);

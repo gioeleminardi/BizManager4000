@@ -8,3 +8,8 @@ cd BizManager4000 && npm start
 ## Init test data
 * Create test data `http://localhost:3000/api/setup`
 * Clean all data `http://localhost:3000/api/reset`
+
+
+## Credits
+Gioele Minardi <gioelem3@gmail.com>
+Matteo Stelluti

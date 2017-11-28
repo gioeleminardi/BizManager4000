@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
-const ObjectId = mongoose.Types.ObjectId;
 
 const InventoryItemSchema = new Schema({
     serialnumber: {
         type: String,
         trim: true,
         required: true,
+        unique: true,
         index: true
     },
     model: {
@@ -40,16 +40,16 @@ InventoryItemSchema.statics.findBySerialNumber = function (serialnumber, cb) {
     return this.findOne({ serialnumber: serialnumber }, cb);
 }
 
-InventoryItemSchema.statics.findByModel = function (model, cb) {
-    return this.findOne({ model: model }, cb);
+InventoryItemSchema.statics.findAllByModel = function (model, cb) {
+    return this.find({ model: model }, cb);
 }
 
-InventoryItemSchema.statics.findByBrand = function (brand, cb) {
-    return this.findOne({ brand: brand }, cb);
+InventoryItemSchema.statics.findAllByBrand = function (brand, cb) {
+    return this.find({ brand: brand }, cb);
 }
 
-InventoryItemSchema.statics.findByUserId = function (userId, cb) {
-    return this.findOne({ user_id: userId }, cb);
+InventoryItemSchema.statics.findAllByUserId = function (userId, cb) {
+    return this.find({ user_id: userId }, cb);
 }
 
 InventoryItemSchema.statics.findByDescription = function (description, cb) {

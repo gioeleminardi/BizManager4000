@@ -2,8 +2,10 @@ var express = require('express');
 var router = express.Router();
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
+router.use(bodyParser.json());
 
 var User = require('./User');
+var Item = require('../inventory/InventoryItem');
 
 router.get('/', (req, res) => {
     User.find({}, (err, users) => {
@@ -32,17 +34,28 @@ router.get('/:username', (req, res) => {
     });
 });
 
+router.get('/:username/items', (req, res) => {
+    User.findByUsername(req.params.username, (err, user) => {
+        if (err) return res.status(500).send('There was a problem finding the user.');
+        if (!user) return res.status(404).send(`User ${req.params.username} not found.`);
+        Item.findAllByUserId(user._id, (err, items) => {
+            if (err) return res.status(500).send('There was a problem finding the users items.');
+            res.status(200).send(items);
+        });
+    });
+});
+
 router.delete('/:username', (req, res) => {
     User.findByUsernameAndRemove(req.params.username, (err, user) => {
         if (err) return res.status(500).send('There was a problem removing the user.');
-        res.status(200).send(`User ${user.username} was deleted.`);        
+        res.status(200).send(`User ${user.username} was deleted.`);
     });
 });
 
 router.put('/:username', (req, res) => {
     User.findByUsernameAndUpdate(req.params.username, req.body, (err, user) => {
         if (err) return res.status(500).send('There was a problem updating the user.');
-        res.status(200).send(user);        
+        res.status(200).send(user);
     });
 });
 

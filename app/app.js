@@ -51,6 +51,7 @@ app.use('/api/reset', (req, res) => {
     console.log('reset!');
     User.remove({}, () => { });
     Item.remove({}, () => { });
+    db.connection.db.dropDatabase();
     res.status(200).send('OK');
 });
 // END DEV
