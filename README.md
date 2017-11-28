@@ -11,5 +11,4 @@ cd BizManager4000 && npm start
 
 
 ## Credits
-Gioele Minardi <gioelem3@gmail.com>
-Matteo Stelluti
+* Gioele Minardi <gioelem3@gmail.com>
