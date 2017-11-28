@@ -26,16 +26,16 @@ const UserSchema = new Schema({
     }
 });
 
-UserSchema.statics.findByUsername = function(username, cb) {
-    return this.findOne({username: username}, cb);
+UserSchema.statics.findByUsername = function (username, cb) {
+    return this.findOne({ username: username }, cb);
 }
 
-UserSchema.statics.findByUsernameAndRemove = function(username, cb) {
-    return this.findOneAndRemove({username: username}, cb);
+UserSchema.statics.findByUsernameAndRemove = function (username, cb) {
+    return this.findOneAndRemove({ username: username }, cb);
 }
 
-UserSchema.statics.findByUsernameAndUpdate = function(username, updatedUser, cb) {
-    return this.findOneAndUpdate({username: username}, updatedUser, {new: true}, cb);
+UserSchema.statics.findByUsernameAndUpdate = function (username, updatedUser, cb) {
+    return this.findOneAndUpdate({ username: username }, updatedUser, { new: true }, cb);
 }
 
 UserSchema.pre('save', function (next) {

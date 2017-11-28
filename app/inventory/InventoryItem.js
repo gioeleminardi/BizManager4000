@@ -36,8 +36,8 @@ const InventoryItemSchema = new Schema({
 
 InventoryItemSchema.index({ description: 'text' });
 
-InventoryItemSchema.statics.findBySerialNumber = function (serialnumber, cb) {
-    return this.findOne({ serialnumber: serialnumber }, cb);
+InventoryItemSchema.statics.findBySerialNumber = function (sn, cb) {
+    return this.findOne({ serialnumber: sn }, cb);
 }
 
 InventoryItemSchema.statics.findAllByModel = function (model, cb) {
@@ -70,5 +70,12 @@ InventoryItemSchema.statics.findByDescription = function (description, cb) {
         .exec(cb);
 }
 
+InventoryItemSchema.statics.findBySerialNumberAndUpdate = function (sn, updatedItem, cb) {
+    return this.findOneAndUpdate({ serialnumber: sn }, updatedItem, { new: true }, cb);
+}
+
+InventoryItemSchema.statics.findBySerialNumberAndRemove = function (sn, cb) {
+    return this.findOneAndRemove({ serialnumber: sn }, cb);
+}
 
 module.exports = mongoose.model('InventoryItem', InventoryItemSchema);

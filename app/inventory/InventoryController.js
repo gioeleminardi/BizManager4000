@@ -55,10 +55,24 @@ router.get('/user_id/:userid', (req, res) => {
     });
 });
 
-router.get('/search/descr/:text', (req, res) => {
-    Item.findByDescription(req.params.text, (err, items) => {
+router.post('/description', (req, res) => {
+    Item.findByDescription(req.body.text, (err, items) => {
         if (err) return res.status(500).send('There was a problem finding the items.');
         res.status(200).send(items);
+    });
+});
+
+router.put('/:serialnumber', (req, res) => {
+    Item.findBySerialNumberAndUpdate(req.params.serialnumber, req.body, (err, item) => {
+        if (err) return res.status(500).send('There was a problem updating the item.');
+        res.status(200).send(item);
+    });
+});
+
+router.delete('/:serialnumber', (req, res) => {
+    Item.findBySerialNumberAndRemove(req.params.serialnumber, (err, item) => {
+        if (err) return res.status(500).send('There was a problem removing the item.');
+        res.status(200).send(item);
     });
 });
 
