@@ -5,16 +5,18 @@ const app = express();
 const morgan = require('morgan');
 const db = require('./db');
 const config = require('../config');
-const UserController = require('./user/UserController');
-const ItemController = require('./inventory/InventoryController');
-const AuthController = require('./auth/AuthController');
+const bodyParser = require('body-parser');
 
-app.set('jwt_secret_key', config.secret);
+// Routes
+const authRoutes = require('./auth/AuthRoutes');
 
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.use(morgan('dev'));
-app.use('/api/auth', AuthController);
-app.use('/api/users', UserController);
-app.use('/api/items', ItemController);
+
+app.use('/api/auth', authRoutes);
+// app.use('/api/users', UserController);
+// app.use('/api/items', ItemController);
 
 // DEV
 const mongoose = require('mongoose');
@@ -51,6 +53,7 @@ app.use('/api/setup', (req, res) => {
             res.status(200).send('OK');
         });
     });
+    console.log(`Test user ${users[0].username} ${users[0].password}`);
 });
 
 app.use('/api/reset', (req, res) => {
@@ -61,5 +64,10 @@ app.use('/api/reset', (req, res) => {
     res.status(200).send('OK');
 });
 // END DEV
+
+// Error Handling
+app.use((req, res) => {
+    res.status(404).json({message: 'Url not found.'});
+});
 
 module.exports = app;

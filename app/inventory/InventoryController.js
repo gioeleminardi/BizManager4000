@@ -1,80 +1,62 @@
 'use strict';
-var express = require('express');
-var router = express.Router();
-var bodyParser = require('body-parser');
-
-router.use(bodyParser.urlencoded({ extended: true }));
-router.use(bodyParser.json());
-
 var Item = require('./InventoryItem');
 
-router.get('/', (req, res) => {
+exports.get_all_items = (req, res) => {
     Item.find({}, (err, items) => {
-        if (err) return res.status(500).send('There was a problem retrieving the items.');
-        res.status(200).send(items);
+        if (err) res.send(err);
+        res.json(items);
     });
-});
+};
 
-router.post('/', (req, res) => {
-    Item.create({
-        serialnumber: req.body.serialnumber,
-        model: req.body.model,
-        brand: req.body.brand,
-        description: req.body.description,
-        user_id: req.body.user_id
-    }, (err, item) => {
-        if (err) return res.status(500).send(err);
-        res.status(200).send(item);
+exports.get_item = (req, res) => {
+    Item.findOne({ serialnumber: req.params.serialnumber }, (err, item) => {
+        if (err) res.send(err);
+        res.json(item);
     });
-});
+};
 
-router.get('/:serialnumber', (req, res) => {
-    Item.findBySerialNumber(req.params.serialnumber, (err, item) => {
-        if (err) return res.status(500).send('There was a problem retrieving the item.');
-        res.status(200).send(item);
+exports.create_item = (req, res) => {
+    const newItem = new Item(req.body);
+    newItem.save((err, item) => {
+        if (err) res.send(err);
+        res.json(item);
     });
-});
+};
 
-router.get('/model/:model', (req, res) => {
-    Item.findAllByModel(req.params.model, (err, items) => {
-        if (err) return res.status(500).send('There was a problem retrieving the items.');
-        res.status(200).send(items);
+exports.update_item = (req, res) => {
+    Item.findOneAndUpdate({ serialnumber: serialnumber }, req.body, { new: true }, (err, item) => {
+        if (err) res.send(err);
+        res.json(item);
     });
-});
+};
 
-router.get('/brand/:brand', (req, res) => {
-    Item.findAllByBrand(req.params.brand, (err, items) => {
-        if (err) return res.status(500).send('There was a problem retrieving the items.');
-        res.status(200).send(items);
+exports.delete_item = (req, res) => {
+    Item.findOneAndRemove({ serialnumber: serialnumber }, (err, item) => {
+        if (err) res.send(err);
+        res.json({ message: 'Item successfully deleted.' });
     });
-});
+};
 
-router.get('/user_id/:userid', (req, res) => {
-    Item.findAllByUserId(req.params.userid, (err, items) => {
-        if (err) return res.status(500).send('There was a problem retrieving the items.');
-        res.status(200).send(items);
+exports.get_user_items = (req, res) => {
+    Item.find({ user_id: req.params.userid }, (err, items) => {
+        if (err) res.send(err);
+        res.json(items);
     });
-});
+};
 
-router.post('/description', (req, res) => {
-    Item.findByDescription(req.body.text, (err, items) => {
-        if (err) return res.status(500).send('There was a problem finding the items.');
-        res.status(200).send(items);
-    });
-});
-
-router.put('/:serialnumber', (req, res) => {
-    Item.findBySerialNumberAndUpdate(req.params.serialnumber, req.body, (err, item) => {
-        if (err) return res.status(500).send('There was a problem updating the item.');
-        res.status(200).send(item);
-    });
-});
-
-router.delete('/:serialnumber', (req, res) => {
-    Item.findBySerialNumberAndRemove(req.params.serialnumber, (err, item) => {
-        if (err) return res.status(500).send('There was a problem removing the item.');
-        res.status(200).send(item);
-    });
-});
-
-module.exports = router;
+exports.search_item = (req, res) => {
+    let searchType = req.query.field;
+    if (searchType === 'description') {
+        Item.findByDescription(req.query.value, (err, items) => {
+            if (err) res.send(err);
+            res.json(items);
+        });
+    } else if (searchType === 'model' || searchType == 'brand' || searchType == 'user_id') {
+        Item.find({ searchType: req.query.value }, (err, items) => {
+            if (err) res.send(err);
+            res.json(items);
+        });
+    } else {
+        res.status(404).json({ message: 'field not valid.' });
+    }
+}
