@@ -1,37 +1,37 @@
 'use strict';
-const express = require('express');
-const router = express.Router();
-const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const User = require('../user/User');
 
-router.use(bodyParser.urlencoded({ extended: true }));
-router.use(bodyParser.json());
-
-router.post('/authenticate', (req, res) => {
-    User.findByUsername(req.body.username, (err, user) => {
+exports.sign_in = (req, res) => {
+    User.findOne({
+        username: req.body.username
+    }, (err, user) => {
         if (err) throw err;
         if (!user) {
-            res.json({ success: false, message: 'Authentication failed.' });
+            res.status(401).json({ message: 'Auth failed. Invalid username.' });
         } else if (user) {
-            bcrypt.compare(req.body.password, user.password, function (err, result) {
-                if (err) throw err;
-                if (!result) res.json({ success: false, message: 'Authentication failed.' });
-                if (result) {
-                    const payload = {
-                        username: user.username,
-                        role: 'TEST_ROLE'
-                    };
-                    var token = jwt.sign(payload, app.get('jwt_secret_key'), {
-                        expiresIn: config.jwt.expiresIn
-                    });
-                    res.json({ success: true, message: 'Authentication ok!', token: token});
-                }
-            });
+            if (!user.comparePassword(req.body.password)) {
+                res.status(401).json({ message: 'Auth failed. Invalid password.' });
+            } else {
+                const payload = {
+                    username: user.username,
+                    role: 'TEST_ROLE'
+                };
+                var token = jwt.sign(payload, app.get('jwt_secret_key'), {
+                    expiresIn: config.jwt.expiresIn
+                });
+                return res.json({ token: token });
+            }
         }
     });
-});
+};
 
-module.exports = router;
+exports.loginRequired = (req, res, next) => {
+    if (req.username) {
+        next();
+    } else {
+        return res.status(401).json({ message: 'Unauthorized user!' });
+    }
+};
