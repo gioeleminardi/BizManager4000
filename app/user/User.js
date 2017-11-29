@@ -1,3 +1,4 @@
+'use strict';
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
@@ -25,6 +26,10 @@ const UserSchema = new Schema({
         required: true
     }
 });
+
+UserSchema.methods.comparePassword = function(password) {
+    return bcrypt.compareSync(password, this.password);
+}
 
 UserSchema.statics.findByUsername = function (username, cb) {
     return this.findOne({ username: username }, cb);

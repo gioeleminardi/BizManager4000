@@ -1,62 +1,84 @@
-var express = require('express');
-var router = express.Router();
-var bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded({ extended: true }));
-router.use(bodyParser.json());
+'use strict';
+const   jwt = require('jsonwebtoken'),
+        config = require('../../config'),
+        User = require('./User');
 
-var User = require('./User');
-var Item = require('../inventory/InventoryItem');
+// router.get('/:username/items', (req, res) => {
+//     User.findByUsername(req.params.username, (err, user) => {
+//         if (err) return res.status(500).send('There was a problem finding the user.');
+//         if (!user) return res.status(404).send(`User ${req.params.username} not found.`);
+//         Item.findAllByUserId(user._id, (err, items) => {
+//             if (err) return res.status(500).send('There was a problem finding the users items.');
+//             res.status(200).send(items);
+//         });
+//     });
+// });
 
-router.get('/', (req, res) => {
+exports.get_user = (req, res) => {
+    User.findOne({ username: req.params.username }, (err, user) => {
+        if (err) res.send(err);
+        res.json(user);
+    });
+};
+
+exports.get_all_users = (req, res) => {
     User.find({}, (err, users) => {
-        if (err) return res.status(500).send('There was a problem retrieving the users.');
-        res.status(200).send(users);
+        if (err) res.send(err);
+        res.json(users);
     });
-});
+};
 
-router.post('/', (req, res) => {
-    User.create({
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        username: req.body.username,
-        password: req.body.password
+exports.update_user = (req, res) => {
+    User.findOneAndUpdate({ username: req.params.username }, req.body, { new: true }, (err, user) => {
+        if (err) res.send(err);
+        res.json(user);
+    });
+};
+
+exports.delete_user = (req, res) => {
+    User.findOneAndRemove({ username: req.params.username }, (err, user) => {
+        if (err) res.send(err);
+        res.json({ message: `User ${user.username} successfully deleted.` });
+    });
+};
+
+exports.register = (req, res) => {
+    const newUser = new User(req.body);
+    newUser.save((err, user) => {
+        if (err) return res.status(400).send({ message: err });
+        user.password = undefined;
+        res.json(user);
+    });
+};
+
+exports.sign_in = (req, res) => {
+    User.findOne({
+        username: req.body.username
     }, (err, user) => {
-        if (err) return res.status(500).send(err);
-        res.status(200).send(user);
-    })
-});
-
-router.get('/:username', (req, res) => {
-    User.findByUsername(req.params.username, (err, user) => {
-        if (err) return res.status(500).send('There was a problem finding the user.');
-        if (!user) return res.status(404).send(`User ${req.params.username} not found.`);
-        res.status(200).send(user);
+        if (err) throw err;
+        if (!user) {
+            res.status(401).json({ message: 'Auth failed. Invalid username.' });
+        } else if (user) {
+            if (!user.comparePassword(req.body.password)) {
+                res.status(401).json({ message: 'Auth failed. Invalid password.' });
+            } else {
+                const payload = {
+                    username: user.username,
+                    role: 'TEST_ROLE'
+                };
+                var token = jwt.sign(payload, app.get('jwt_secret_key'), {
+                    expiresIn: config.jwt.expiresIn
+                });
+                return res.json({ token: token });
+            }
+        }
     });
-});
+};
 
-router.get('/:username/items', (req, res) => {
-    User.findByUsername(req.params.username, (err, user) => {
-        if (err) return res.status(500).send('There was a problem finding the user.');
-        if (!user) return res.status(404).send(`User ${req.params.username} not found.`);
-        Item.findAllByUserId(user._id, (err, items) => {
-            if (err) return res.status(500).send('There was a problem finding the users items.');
-            res.status(200).send(items);
-        });
-    });
-});
-
-router.delete('/:username', (req, res) => {
-    User.findByUsernameAndRemove(req.params.username, (err, user) => {
-        if (err) return res.status(500).send('There was a problem removing the user.');
-        res.status(200).send(`User ${user.username} was deleted.`);
-    });
-});
-
-router.put('/:username', (req, res) => {
-    User.findByUsernameAndUpdate(req.params.username, req.body, (err, user) => {
-        if (err) return res.status(500).send('There was a problem updating the user.');
-        res.status(200).send(user);
-    });
-});
-
-module.exports = router;
+exports.loginRequired = (req, res, next) => {
+    if (req.username) {
+        next();
+    } else {
+        return res.status(401).json({ message: 'Unauthorized user!' });
+    }
+};

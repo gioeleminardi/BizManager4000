@@ -1,11 +1,15 @@
+'use strict';
 // app.js
-var express = require('express');
-var app = express();
-var morgan = require('morgan');
-var db = require('./db');
-var UserController = require('./user/UserController');
-var ItemController = require('./inventory/InventoryController');
-var AuthController = require('./auth/AuthController');
+const express = require('express');
+const app = express();
+const morgan = require('morgan');
+const db = require('./db');
+const config = require('../config');
+const UserController = require('./user/UserController');
+const ItemController = require('./inventory/InventoryController');
+const AuthController = require('./auth/AuthController');
+
+app.set('jwt_secret_key', config.secret);
 
 app.use(morgan('dev'));
 app.use('/api/auth', AuthController);
@@ -17,8 +21,8 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const uuid = require('uuid');
 
-var User = require('./user/User');
-var Item = require('./inventory/InventoryItem');
+const User = require('./user/User');
+const Item = require('./inventory/InventoryItem');
 
 app.use('/api/setup', (req, res) => {
     var users = [1, 2, 3, 4, 5].map(function (_) {
