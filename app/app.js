@@ -5,8 +5,10 @@ var morgan = require('morgan');
 var db = require('./db');
 var UserController = require('./user/UserController');
 var ItemController = require('./inventory/InventoryController');
+var AuthController = require('./auth/AuthController');
 
 app.use(morgan('dev'));
+app.use('/api/auth', AuthController);
 app.use('/api/users', UserController);
 app.use('/api/items', ItemController);
 
