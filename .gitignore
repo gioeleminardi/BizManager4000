@@ -60,4 +60,4 @@ typings/
 
 .vscode/**
 .vscode
-secure
+secure/*.pem
