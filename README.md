@@ -2,7 +2,9 @@
 ## Quick start
 ```bash
 git clone https://github.com/gioeleminardi/BizManager4000.git
-cd BizManager4000 && npm start
+cd BizManager4000
+openssl req -x509 -newkey rsa:2048 -keyout secure/key.pem -out secure/cert.pem -days 365
+npm start
 ```
 
 ## Init test data
