@@ -1,5 +1,5 @@
 'use strict';
 // db.js
-var mongoose = require('mongoose');
-var config = require('../config');
+const mongoose = require('mongoose');
+const config = require('../config');
 module.exports = mongoose.connect(config.database);

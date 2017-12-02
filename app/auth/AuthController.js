@@ -1,12 +1,11 @@
 'use strict';
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const config = require('../../config');
 const User = require('../user/User');
 
 exports.sign_in = (req, res) => {
     const username = req.body.username;
-    if (!username) return res.status(401).json({message: 'You must provide username and password parameters.'});
+    if (!username) return res.status(401).json({ message: 'You must provide username and password parameters.' });
     User.findOne({
         username: req.body.username
     }, (err, user) => {
@@ -21,7 +20,7 @@ exports.sign_in = (req, res) => {
                     username: user.username,
                     role: 'TEST_ROLE'
                 };
-                var token = jwt.sign(payload, config.jwt.secret, {
+                let token = jwt.sign(payload, config.jwt.secret, {
                     expiresIn: config.jwt.expiresIn
                 });
                 return res.json({ token: token });

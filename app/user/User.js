@@ -27,24 +27,24 @@ const UserSchema = new Schema({
     }
 });
 
-UserSchema.methods.comparePassword = function(password) {
+UserSchema.methods.comparePassword = function (password) {
     return bcrypt.compareSync(password, this.password);
-}
+};
 
 UserSchema.statics.findByUsername = function (username, cb) {
     return this.findOne({ username: username }, cb);
-}
+};
 
 UserSchema.statics.findByUsernameAndRemove = function (username, cb) {
     return this.findOneAndRemove({ username: username }, cb);
-}
+};
 
 UserSchema.statics.findByUsernameAndUpdate = function (username, updatedUser, cb) {
     return this.findOneAndUpdate({ username: username }, updatedUser, { new: true }, cb);
-}
+};
 
 UserSchema.pre('save', function (next) {
-    var user = this;
+    let user = this;
     bcrypt.hash(user.password, 10, function (err, hash) {
         if (err) return next(err);
         user.password = hash;

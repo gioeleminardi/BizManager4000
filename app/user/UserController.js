@@ -1,7 +1,5 @@
 'use strict';
-const   jwt = require('jsonwebtoken'),
-        config = require('../../config'),
-        User = require('./User');
+const User = require('./User');
 
 exports.get_user = (req, res) => {
     User.findOne({ username: req.params.username }, (err, user) => {

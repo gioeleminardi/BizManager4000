@@ -9,14 +9,16 @@ const bodyParser = require('body-parser');
 
 // Routes
 const authRoutes = require('./auth/AuthRoutes');
+const userRoutes = require('./user/UserRoutes');
+const itemRoutes = require('./inventory/InventoryRoutes');
 
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 
 app.use('/api/auth', authRoutes);
-// app.use('/api/users', UserController);
-// app.use('/api/items', ItemController);
+app.use('/api/users', userRoutes);
+app.use('/api/items', itemRoutes);
 
 // DEV
 const mongoose = require('mongoose');
@@ -27,7 +29,7 @@ const User = require('./user/User');
 const Item = require('./inventory/InventoryItem');
 
 app.use('/api/setup', (req, res) => {
-    var users = [1, 2, 3, 4, 5].map(function (_) {
+    let users = [1, 2, 3, 4, 5].map(function (_) {
         return {
             firstname: uuid.v4(),
             lastname: uuid.v4(),
@@ -36,7 +38,7 @@ app.use('/api/setup', (req, res) => {
             _id: new ObjectId()
         }
     });
-    var items = Array.from(new Array(20), function (x, i) { i + 1 }).map(function (_) {
+    let items = Array.from(new Array(20), function (x, i) { i + 1 }).map(function (_) {
         return {
             _id: new ObjectId(),
             serialnumber: uuid.v4(),

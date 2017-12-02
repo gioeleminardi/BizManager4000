@@ -1,5 +1,6 @@
 'use strict';
 var Item = require('./InventoryItem');
+var User = require('../user/User');
 
 exports.get_all_items = (req, res) => {
     Item.find({}, (err, items) => {
@@ -38,9 +39,12 @@ exports.delete_item = (req, res) => {
 };
 
 exports.get_user_items = (req, res) => {
-    Item.find({ user_id: req.params.userid }, (err, items) => {
+    User.findOne({ username: req.params.username }, (err, user) => {
         if (err) res.send(err);
-        res.json(items);
+        Item.find({ user_id: user._id }, (err, items) => {
+            if (err) res.send(err);
+            res.json(items);
+        });
     });
 };
 
