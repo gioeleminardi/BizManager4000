@@ -9,13 +9,15 @@ const bodyParser = require('body-parser');
 
 // Routes
 const authRoutes = require('./auth/AuthRoutes');
+const authController = require('./auth/AuthController');
 const userRoutes = require('./user/UserRoutes');
 const itemRoutes = require('./inventory/InventoryRoutes');
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 
+app.use(authController.get_req_token);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/items', itemRoutes);
@@ -69,7 +71,7 @@ app.use('/api/reset', (req, res) => {
 
 // Error Handling
 app.use((req, res) => {
-    res.status(404).json({message: 'Url not found.'});
+    res.status(404).json({ message: `${req.originalUrl} not found!` });
 });
 
 module.exports = app;

@@ -29,6 +29,23 @@ exports.sign_in = (req, res) => {
     });
 };
 
+exports.get_req_token = (req, res, next) => {
+    if (req.headers && req.headers.authorization && req.headers.authorization.split(' ')[0] === 'JWT') {
+        jwt.verify(req.headers.authorization.split(' ')[1], config.jwt.secret, function (err, decode) {
+            if (err) {
+                req.user = undefined;
+                console.log(err);
+                next();
+            }
+            req.user = decode;
+            next();
+        });
+    } else {
+        req.user = undefined;
+        next();
+    }
+};
+
 exports.loginRequired = (req, res, next) => {
     if (req.username) {
         next();
